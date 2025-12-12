@@ -20,6 +20,7 @@ const App = () => {
 
     try {
       const user = await loginService.login({ username, password });
+      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
       console.log(user);
       setUser(user);
       setUsername("");
@@ -30,6 +31,11 @@ const App = () => {
         setErrorMessage(null);
       }, 3000);
     }
+  };
+
+  const handleLogout = async () => {
+    window.localStorage.removeItem("loggedBlogAppUser");
+    setUser(null);
   };
 
   const loginForm = () => (
@@ -54,7 +60,7 @@ const App = () => {
           />
         </label>
       </div>
-      <button type="submit">login</button>
+      <button type="submit">Login</button>
     </form>
   );
 
@@ -70,7 +76,10 @@ const App = () => {
       {user && (
         <div>
           <h2>blogs</h2>
-          <p>{`${user.username} logged in`}</p>
+          <p>
+            {`${user.username} logged in `}
+            <button onClick={handleLogout}>Logout</button>
+          </p>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
