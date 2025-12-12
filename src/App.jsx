@@ -6,13 +6,13 @@ import loginService from "./services/login";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -80,6 +80,17 @@ const App = () => {
     </form>
   );
 
+  const clearBlogForm = () => {
+    setTitle("");
+    setAuthor("");
+    setUrl("");
+  };
+
+  const clearLoginForm = () => {
+    setUsername("");
+    setPassword("");
+  };
+
   const handleBlogFormSubmit = async (event) => {
     event.preventDefault();
     const newBlog = {
@@ -88,11 +99,18 @@ const App = () => {
       url,
     };
 
-    const createdBlog = await blogService.create(newBlog);
-    setBlogs(blogs.concat(createdBlog));
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+    try {
+      const createdBlog = await blogService.create(newBlog);
+      setBlogs(blogs.concat(createdBlog));
+      showNotification(
+        "success",
+        `a new blog "${createdBlog.title}" by ${createdBlog.author} added`
+      );
+      clearBlogForm();
+    } catch (error) {
+      showNotification("error", error.response.data.error);
+      clearBlogForm();
+    }
   };
 
   const handleLogin = async (event) => {
@@ -103,19 +121,21 @@ const App = () => {
       window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
-      setUsername("");
-      setPassword("");
+      clearLoginForm();
     } catch (error) {
-      setErrorMessage(error.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 3000);
+      showNotification("error", error.response.data.error);
+      clearLoginForm();
     }
   };
 
   const handleLogout = async () => {
     window.localStorage.removeItem("loggedBlogAppUser");
     setUser(null);
+  };
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 3000);
   };
 
   const loginForm = () => (
@@ -149,13 +169,14 @@ const App = () => {
       {!user && (
         <div>
           <h2>log in to application</h2>
-          <Notification message={errorMessage} />
+          <Notification notification={notification} />
           {loginForm()}
         </div>
       )}
       {user && (
         <div>
           <h2>blogs</h2>
+          <Notification notification={notification} />
           <p>
             {`${user.username} logged in `}
             <button onClick={handleLogout}>Logout</button>
