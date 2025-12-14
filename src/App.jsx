@@ -12,10 +12,8 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
   const [notification, setNotification] = useState(null);
+
   const blogFormRef = useRef();
 
   useEffect(() => {
@@ -36,7 +34,7 @@ const App = () => {
         const blogs = await blogService.getAll();
         setBlogs(blogs);
       } catch (error) {
-        console.error("Error fetching blogs:", error);
+        showNotification("error", `failed to fetch blogs ${error}`);
       }
     };
 
@@ -45,25 +43,12 @@ const App = () => {
     }
   }, [user]);
 
-  const clearBlogForm = () => {
-    setTitle("");
-    setAuthor("");
-    setUrl("");
-  };
-
   const clearLoginForm = () => {
     setUsername("");
     setPassword("");
   };
 
-  const handleBlogFormSubmit = async (event) => {
-    event.preventDefault();
-    const newBlog = {
-      title,
-      author,
-      url,
-    };
-
+  const handleBlogFormSubmit = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog);
       setBlogs(blogs.concat(createdBlog));
@@ -74,10 +59,8 @@ const App = () => {
         "success",
         `a new blog "${createdBlog.title}" by ${createdBlog.author} added`
       );
-      clearBlogForm();
     } catch (error) {
       showNotification("error", error.response.data.error);
-      clearBlogForm();
     }
   };
 
@@ -96,7 +79,7 @@ const App = () => {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogAppUser");
     setUser(null);
   };
@@ -121,27 +104,21 @@ const App = () => {
           />
         </div>
       )}
+
       {user && (
         <div>
           <h2>blogs</h2>
           <Notification notification={notification} />
+
           <p>
-            {`${user.username} logged in `}
-            <button onClick={handleLogout}>Logout</button>
+            {user.username} logged in{" "}
+            <button onClick={handleLogout}>logout</button>
           </p>
-          <div>
-            <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
-              <BlogForm
-                handleBlogFormSubmit={handleBlogFormSubmit}
-                title={title}
-                handleTitleChange={({ target }) => setTitle(target.value)}
-                author={author}
-                handleAuthorChange={({ target }) => setAuthor(target.value)}
-                url={url}
-                handleUrlChange={({ target }) => setUrl(target.value)}
-              />
-            </Togglable>
-          </div>
+
+          <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+            <BlogForm createBlog={handleBlogFormSubmit} />
+          </Togglable>
+
           <div>
             {blogs.map((blog) => (
               <Blog key={blog.id} blog={blog} />
