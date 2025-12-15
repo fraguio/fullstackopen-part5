@@ -35,8 +35,8 @@ const Blog = ({ user, blog, setBlogs }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      <div>
+    <div style={blogStyle} className="blog">
+      <div className="blog-summary">
         {blog.title} {blog.author}{' '}
         <button onClick={() => setShowDetail(!showDetail)}>
           {showDetail ? 'hide' : 'view'}
@@ -44,9 +44,9 @@ const Blog = ({ user, blog, setBlogs }) => {
       </div>
 
       {showDetail && (
-        <div>
-          <div>{blog.url}</div>
-          <div>
+        <div className="blog-details">
+          <div className="blog-url">{blog.url}</div>
+          <div className="blog-likes">
             likes {blog.likes} <button onClick={handleLike}>like</button>
           </div>
           <div>{blog.author}</div>
