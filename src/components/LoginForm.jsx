@@ -5,7 +5,7 @@ const LoginForm = (props) => {
     handleUsernameChange,
     password,
     handlePasswordChange,
-  } = props;
+  } = props
 
   return (
     <form onSubmit={handleLogin}>
@@ -14,7 +14,7 @@ const LoginForm = (props) => {
           username
           <input
             type="text"
-            value={username}        
+            value={username}
             onChange={handleUsernameChange}
           />
         </label>
@@ -31,7 +31,7 @@ const LoginForm = (props) => {
       </div>
       <button type="submit">Login</button>
     </form>
-  );
-};
+  )
+}
 
-export default LoginForm;
+export default LoginForm

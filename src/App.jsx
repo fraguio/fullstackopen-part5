@@ -1,29 +1,29 @@
-import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
-import Notification from "./components/Notification";
-import BlogForm from "./components/BlogForm";
-import blogService from "./services/blogs";
-import LoginForm from "./components/LoginForm";
-import loginService from "./services/login";
-import Togglable from "./components/Togglable";
+import { useState, useEffect, useRef } from 'react'
+import Blog from './components/Blog'
+import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import blogService from './services/blogs'
+import LoginForm from './components/LoginForm'
+import loginService from './services/login'
+import Togglable from './components/Togglable'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
-  const [notification, setNotification] = useState(null);
+  const [blogs, setBlogs] = useState([])
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState(null)
 
-  const blogFormRef = useRef();
+  const blogFormRef = useRef()
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     // Define y llama a una función asíncrona dentro del callback.
@@ -31,63 +31,63 @@ const App = () => {
     const fetchBlogs = async () => {
       try {
         // Uso de await dentro de la función asíncrona
-        const blogs = await blogService.getAll();
-        setBlogs(blogs);
+        const blogs = await blogService.getAll()
+        setBlogs(blogs)
       } catch (error) {
-        showNotification("error", `failed to fetch blogs ${error}`);
+        showNotification('error', `failed to fetch blogs ${error}`)
       }
-    };
+    }
 
     if (user) {
-      fetchBlogs();
+      fetchBlogs()
     }
-  }, [user]);
+  }, [user])
 
   const clearLoginForm = () => {
-    setUsername("");
-    setPassword("");
-  };
+    setUsername('')
+    setPassword('')
+  }
 
   const handleBlogFormSubmit = async (newBlog) => {
     try {
-      const createdBlog = await blogService.create(newBlog);
-      setBlogs(blogs.concat(createdBlog));
+      const createdBlog = await blogService.create(newBlog)
+      setBlogs(blogs.concat(createdBlog))
 
-      blogFormRef.current.toggleVisibility();
+      blogFormRef.current.toggleVisibility()
 
       showNotification(
-        "success",
+        'success',
         `a new blog "${createdBlog.title}" by ${createdBlog.author} added`
-      );
+      )
     } catch (error) {
-      showNotification("error", error.response.data.error);
+      showNotification('error', error.response.data.error)
     }
-  };
+  }
 
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      clearLoginForm();
+      const user = await loginService.login({ username, password })
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
+      blogService.setToken(user.token)
+      setUser(user)
+      clearLoginForm()
     } catch (error) {
-      showNotification("error", error.response.data.error);
-      clearLoginForm();
+      showNotification('error', error.response.data.error)
+      clearLoginForm()
     }
-  };
+  }
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogAppUser");
-    setUser(null);
-  };
+    window.localStorage.removeItem('loggedBlogAppUser')
+    setUser(null)
+  }
 
   const showNotification = (type, message) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3000);
-  };
+    setNotification({ type, message })
+    setTimeout(() => setNotification(null), 3000)
+  }
 
   return (
     <div>
@@ -111,7 +111,7 @@ const App = () => {
           <Notification notification={notification} />
 
           <p>
-            {user.username} logged in{" "}
+            {user.username} logged in{' '}
             <button onClick={handleLogout}>logout</button>
           </p>
 
@@ -130,13 +130,13 @@ const App = () => {
                     blog={blog}
                     setBlogs={setBlogs}
                   />
-                );
+                )
               })}
           </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
