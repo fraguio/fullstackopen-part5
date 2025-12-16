@@ -41,6 +41,16 @@ export default [
     }
   },
 
+  // Playwright / Node
+  {
+    files: ['e2e/**/*.js', 'playwright.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      }
+    }
+  },
+
   // Vitest
   {
     files: ['**/*.test.{js,jsx}'],
