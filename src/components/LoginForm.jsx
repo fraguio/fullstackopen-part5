@@ -13,6 +13,7 @@ const LoginForm = (props) => {
         <label>
           username
           <input
+            data-testid='username'
             type="text"
             value={username}
             onChange={handleUsernameChange}
@@ -23,6 +24,7 @@ const LoginForm = (props) => {
         <label>
           password
           <input
+            data-testid='password'
             type="password"
             value={password}
             onChange={handlePasswordChange}
