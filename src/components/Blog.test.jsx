@@ -69,3 +69,45 @@ test('show URL and likes when clicking the view button', async () => {
   expect(screen.getByText(/likes/i)).toBeInTheDocument()
 
 })
+
+test('clicking like button twice calls event handler twice', async () => {
+  const blog = {
+    id: '1',
+    title: 'Testing React',
+    author: 'Ada Lovelace',
+    url: 'http://example.com',
+    likes: 10,
+    user: {
+      id: '1',
+      username: 'ada',
+    },
+  }
+
+  const user = {
+    id: '1',
+    username: 'ada',
+  }
+
+  const mockLikeHandler = vi.fn()
+  const mockDeleteHandler = vi.fn()
+
+  render(
+    <Blog
+      blog={blog}
+      user={user}
+      handleLike={mockLikeHandler}
+      handleDelete={mockDeleteHandler}
+    />
+  )
+
+  const userEventInstance = userEvent.setup()
+
+  // mostrar detalles
+  await userEventInstance.click(screen.getByText('view'))
+
+  const likeButton = screen.getByText('like')
+  await userEventInstance.click(likeButton)
+  await userEventInstance.click(likeButton)
+
+  expect(mockLikeHandler).toHaveBeenCalledTimes(2)
+})
