@@ -64,6 +64,28 @@ const App = () => {
     }
   }
 
+  const handleDelete = async (blog) => {
+    const ok = window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
+    if (!ok) return
+
+    await blogService.remove(blog.id)
+    setBlogs((blogs) => blogs.filter((b) => b.id !== blog.id))
+  }
+
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user.id,
+    }
+
+    const returnedBlog = await blogService.update(blog.id, updatedBlog)
+
+    setBlogs((blogs) =>
+      blogs.map((b) => (b.id === blog.id ? returnedBlog : b))
+    )
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -128,7 +150,8 @@ const App = () => {
                     key={blog.id}
                     user={user}
                     blog={blog}
-                    setBlogs={setBlogs}
+                    handleDelete = {handleDelete}
+                    handleLike={handleLike}
                   />
                 )
               })}
