@@ -141,5 +141,52 @@ describe('Blog app', () => {
         page.getByRole('button', { name: 'Delete' })
       ).not.toBeVisible()
     })
+
+    test('blogs are ordered by likes in descending order', async ({ page }) => {
+      const createBlog = async (title) => {
+        await page.getByRole('button', { name: 'Create new blog' }).click()
+        await page.getByTestId('title').fill(title)
+        await page.getByTestId('author').fill('Author')
+        await page.getByTestId('url').fill('http://example.com')
+        await page.getByRole('button', { name: 'create' }).click()
+      }
+
+      await createBlog('First blog')
+      await createBlog('Second blog')
+      await createBlog('Third blog')
+
+      const getBlog = (title) =>
+        page.locator('.blog', { hasText: title })
+
+      const getLikeButton = (blogTitle) =>
+        getBlog(blogTitle).getByRole('button', { name: 'like' })
+
+      // First blog -> 1 like
+      await getBlog('First blog').getByRole('button', { name: 'view' }).click()
+      let likeButton = getLikeButton('First blog')
+      await likeButton.click()
+
+      // Second blog -> 2 likes
+      await getBlog('Second blog').getByRole('button', { name: 'view' }).click()
+      likeButton = getLikeButton('Second blog')
+      await likeButton.click()
+      await likeButton.click()
+
+      // Third blog -> 3 likes
+      await getBlog('Third blog').getByRole('button', { name: 'view' }).click()
+      likeButton = getLikeButton('Third blog')
+      await likeButton.click()
+      await likeButton.click()
+      await likeButton.click()
+
+      // leer orden final del DOM
+      const likes = await page.locator('.blog').evaluateAll(blogs =>
+        blogs.map(blog =>
+          Number(blog.querySelector('[data-testid="likes-count"]').textContent)
+        )
+      )
+
+      expect(likes).toEqual([...likes].sort((a, b) => b - a))
+    })
   })
 })
