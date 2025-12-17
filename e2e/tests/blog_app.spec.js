@@ -77,5 +77,29 @@ describe('Blog app', () => {
         .toHaveText(String(likesBefore + 1))
     })
 
+    test('the user who added the blog can delete it', async ({ page }) => {
+      // create blog
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.getByTestId('title').fill('Blog to delete')
+      await page.getByTestId('author').fill('Delete Tester')
+      await page.getByTestId('url').fill('http://example.com')
+      await page.getByRole('button', { name: 'create' }).click()
+
+      // open the blog
+      await page.getByRole('button', { name: 'view' }).click()
+
+      // register the handler (listener) BEFORE the click
+      page.on('dialog', dialog => dialog.accept())
+
+      // click on Delete (this triggers the confirm that executes the callback dialog.accept())
+      await page.getByRole('button', { name: 'delete' }).click()
+
+      // check that the blog no longer exists
+      await expect(
+        page.getByText('Blog to delete Delete Tester')
+      ).not.toBeVisible()
+    })
+
+
   })
 })
